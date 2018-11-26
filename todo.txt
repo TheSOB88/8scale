@@ -5,4 +5,4 @@ Comments
 Change scale in program
 Change pitch/octave offset in program
 Different keyboard setups
-Move to different frontend lib
+Move to different frontend libs
