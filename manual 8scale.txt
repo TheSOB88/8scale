@@ -1,0 +1,9 @@
+
+midi.pitch_bend( int( halfTone * .0392 ), 2 )
+midi.pitch_bend( int( halfTone * -.137 ), 3 )
+midi.pitch_bend( int( halfTone * -.487 ), 4 )
+midi.pitch_bend( int( halfTone * .0196 ), 5 )
+midi.pitch_bend( int( halfTone * -.405 ), 6 )
+midi.pitch_bend( int( halfTone * .688 ), 7 )
+midi.pitch_bend( int( halfTone * .883 ), 8 )
+diatonicToChromatic = [0, 0, 2, 4, 5, 7, 9, 9, 10]
