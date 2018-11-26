@@ -1,1 +1,5 @@
 TODO
+Graphic display of notes playing
+Change instrument
+Comments
+Change scale in program
