@@ -2,6 +2,7 @@
 
 import pygame, os, random, pygame.draw as draw, pygame.midi
 import math
+import time
 from pygame.locals import *
 from fractions import Fraction
 
@@ -113,9 +114,19 @@ def main():
                     quitFlag = True
                     print( 'quittin\'' )
                     break
+                #toggle the note toggle
                 if evKey == K_SPACE and event.type == KEYDOWN:
                     toggleNotes = not toggleNotes
                     break
+                #stop all notes
+                if evKey == K_RALT and event.type == KEYDOWN:
+                    for i in range( 0, 16 ):
+                        midi.write( [[[0xb0 + i,123,0], time.time()]] )
+                        playingNotes = set()
+                    initPitches( midi )
+                    break
+                
+                #get note info from key
                 diatonicNote, octave = getKeyInfo( evKey )
                 octave += 2
                 chromaticNote = diatonicToChromatic[diatonicNote]
@@ -125,6 +136,8 @@ def main():
                     midiChannel += 1
                 if midiChannel > 15:
                     midiChannel -= 16
+                
+                #do the note
                 args = ( midiNote, midiVel, midiChannel )
                 if toggleNotes:
                     if event.type == KEYDOWN:
@@ -139,6 +152,8 @@ def main():
                         midi.note_on( *args )
                     else:
                         midi.note_off( *args )
+                        if evKey in playingNotes:
+                            playingNotes.remove( evKey ) 
         clock.tick(60)
     pygame.quit()
 
