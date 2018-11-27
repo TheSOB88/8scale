@@ -95,6 +95,8 @@ def get_note_info( evKey, scale ):
         row_even = y % 2 == 0
         octave = math.floor( y / 2 )
         x, octave = normalize_note( x, octave, len( scale.diatonic ) )
+        if not row_even and x == 0:
+            octave -= 1
         note = scale.full.index( (scale.diatonic if row_even else scale.accidental)[x] )
     else:
         note, octave = normalize_note( x, y, len( scale.full ) )

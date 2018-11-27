@@ -10,3 +10,4 @@ Coding
     Move to different frontend lib
     Comments
     Debug statements
+    Read config from file
