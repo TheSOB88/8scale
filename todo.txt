@@ -1,8 +1,12 @@
 TODO
-Graphic display of notes playing
-Change instrument
-Comments
-Change scale in program
-Change pitch/octave offset in program
-Different keyboard setups
-Move to different frontend lib
+Features
+    Graphic display of notes playing
+    Change instrument in program
+    Change scale in program
+    Change pitch/octave offset in program
+    Different keyboard setups (rows for accidentals)
+
+Coding
+    Move to different frontend lib
+    Comments
+    Debug statements

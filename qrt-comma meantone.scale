@@ -1,0 +1,35 @@
+41.0590	-12	Dbb	Diminished second, diesis		d2	[7 0 -3>
+76.0490	7	C#	Augmented unison, chromatic semitone	A1	[-4 0 7/4>
+117.108	-5	Db	Minor second, diatonic semitone		m2	[3 0 -5/4>
+152.098	14	C##	Augmented chromatic semitone			[-8 0 7/2>
+158.167	-17	Ebbb	Doubly diminished third				[10 0 -17/4>
+193.157	2	D	Major second				M2	[-1 0 1/2>
+234.216	-10	Ebb	Diminished third			d3	[6 0 -5/2>
+269.206	9	D#	Augmented second			A2	[-5 0 9/4>
+310.265	-3	Eb	Minor third				m3	[2 0 -3/4>
+345.255	16	D##	Doubly augmented second				[-9 0 4>
+351.324	-15	Fbb	Doubly diminished fourth			[9 0 -15/4>
+386.314	4	E	Major third				M3	[-2 0 1>
+427.373	-8	Fb	Diminished fourth			d4	[5 0 -2>
+462.363	11	E#	Augmented third				A3	[-6 0 11/4>
+503.422	-1	F	"Perfect" fourth			P4	[1 0 -1/4>
+544.480	-13	Gbb	Doubly diminished fifth				[8 0 -13/4>
+579.471	6	F#	Augmented fourth			A4	[-3 0 3/2>
+620.529	-6	Gb	Diminished fifth			d5	[4 0 -3/2>
+655.520	13	F##	Doubly augmented fourth				[-7 0 13/4>
+696.578	1	G	"Perfect" fifth				P5	[0 0 1/4>
+737.637	-11	Abb	Diminshed sixth				d6	[7 0 -11/4>
+772.627	8	G#	Augmented fifth				A5	[-4 0 2>
+813.686	-4	Ab	Minor sixth				m6	[3 0 -1>
+848.676	15	G##	Doubly augmented fifth				[-8 0 15/4>
+854.745	-16	Bbbb	Doubly diminished seventh			[10 0 -4>
+889.735	3	A	Major sixth				M6	[-1 0 3/4>
+930.794	-9	Bbb	Diminished seventh			d7	[6 0 -9/4>
+965.784	10	A#	Augmented sixth				A6	[-5 0 5/2>
+1006.84	-2	Bb	Minor seventh				m7	[2 0 -1/2>
+1041.83	17	A##	Doubly augmented sixth				[-9 0 17/4>
+1047.90	-14	C`bb	Doubly diminished octave			[9 0 -7/2>
+1082.89	5	B	Major seventh				M7	[-2 0 5/4>
+1123.95	-7	C`b	Diminished octave			d8	[5 0 -7/4>
+1158.94	12	B#	Augmented seventh			A7	[-6 0 3>
+1200	0	C`	Perfect octave				P8	[1 0 0>

@@ -6,6 +6,8 @@ import time
 from pygame.locals import *
 from fractions import Fraction
 
+from scale import Scale
+
 #see if we can load more than standard BMP
 if not pygame.image.get_extended():
     raise SystemExit( "Sorry, extended image module required" )
@@ -17,24 +19,33 @@ keyboard = [ [96, 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 45, 61, 8], #num row
 keyboard.reverse()
 
 #scales
-oncical_scale = [ 0, 65.52, 161.88, 259.24, 356.6, 453.96, 551.32, 713.2, 810.56, 907.92, 1005.28, 1102.64 ]
-qms = qrt_meantone_scale = [0, 41.0590, 76.0490, 117.108, 152.098, 158.167, 193.157, 234.216, 269.206, 310.265, 345.255, 351.324,
+oncical_scale = Scale( [ 0, 65.52, 161.88, 259.24, 356.6, 453.96, 551.32, 713.2, 810.56, 907.92, 1005.28, 1102.64 ] )
+qms = [0, 41.0590, 76.0490, 117.108, 152.098, 158.167, 193.157, 234.216, 269.206, 310.265, 345.255, 351.324,
         386.314, 427.373, 462.363, 503.422, 544.480, 579.471, 620.529, 655.520, 696.578, 737.637, 772.627, 813.686, 848.676, 
         854.745, 889.735, 930.794, 965.784, 1006.84, 1041.83, 1047.90, 1082.89, 1123.95, 1158.94]
+qmsc = qms_chromatic = [ qms[i] if i < 20 else qms[i-1] for i in range( 0, len(qms), 3 ) ]
+        #[qms[0], qms[3], qms[6], qms[9], qms[12], qms[15], qms[18], qms[20], qms[23], qms[26], qms[29], qms[32]]
+qms_diatonic = [ qmsc[i] for i in [0, 2, 4, 5, 7, 9, 11] ]
+qms_accidental = [qms[34], qmsc[1], qmsc[3], qms[14], qmsc[6], qmsc[8], qmsc[10]]
+#qmsc.append( qms[34], qms[14 )
+qrt_meantone_scale = Scale( qms_chromatic, qms_diatonic, qms_accidental )
 
-degrees = 12
-scale = [ Fraction( degrees+i )/degrees for i in range( degrees ) ]
-scale = oncical_scale
-scale = [ qms[0], qms[3], qms[6], qms[9], qms[12], qms[15], qms[18], qms[20], qms[23], qms[26], qms[29], qms[32] ]
-degrees = len( scale )
-noteShift = 1
+# degrees = 12
+# scale = [ Fraction( degrees+i )/degrees for i in range( degrees ) ]
+# scale = oncical_scale
+# scale = qms_chromatic
+scale = qrt_meantone_scale
+degrees = len( scale.full )
 
-diatonicToChromatic = [0]#, 0, 2, 4, 5, 7, 9, 9, 10]
-bendCents = [0]
+diatonic_flag = True
+noteShift = -1
+
+note_to_halftones = []#, 0, 2, 4, 5, 7, 9, 9, 10]
+bendCents = []
 log2, octCents = math.log( 2 ), 1200
-for i, j in enumerate( scale ):
+for i, j in enumerate( scale.full ):
     noteCents, info = None, None
-    if scale[1] < 2:
+    if scale.use_ratios:
         info = Fraction( j )
         info = str( j.numerator ) + '/' + str( j.denominator )
         noteCents = math.log( j ) / log2 * octCents
@@ -43,38 +54,53 @@ for i, j in enumerate( scale ):
         info = str( noteCents )
     halfTones = math.floor( noteCents / 100 )
     pitchBend = noteCents / 100 - halfTones
-    diatonicToChromatic.append( halfTones )
+    note_to_halftones.append( halfTones )
     bendCents.append( pitchBend )
     print( ( i+1, info, noteCents, halfTones, pitchBend ) )
     
 def initPitches( midi ):
-    global diatonicToChromatic
+    global note_to_halftones
     halfTone = 4096
     for i, bend in enumerate( bendCents ):
+        #skip drum channel
         if i > 8:
             i += 1
         midi.pitch_bend( int( halfTone * bend ), i )
         midi.set_instrument( 62, i )
 
-def getKeyInfo( evKey ):
-    note, octave = 0, 0
+#keeps note within an octave span, updates octave appropriately
+def normalize_note( note, octave, span ):
+    if note < 0:
+        octave -= 1
+        note += len( scale.diatonic )
+    if note >= len( scale.diatonic ):
+        note -= len( scale.diatonic )
+        octave += 1
+    return (note, octave)
+
+#get scale degree and octave for the key pressed
+def get_note_info( evKey, scale ):
+    x, y = None, None
     for j, row in enumerate( keyboard ):
         for i, key in enumerate( row ):
             if key == evKey:
-                note, octave = i + noteShift, j
+                x, y = i + noteShift, j
                 break
-                break
-    if not note:
-        #return -1
-        pass
-    if note == 0:
-        octave -= 1
-        note = degrees
-    if note > degrees:
-        note -= degrees
-        octave += 1
+        if x is not None:
+            break
+    else:
+        x, y = 0, 0
         
-    return( note, octave )
+    if diatonic_flag:
+        row_even = y % 2 == 0
+        octave = math.floor( y / 2 )
+        x, octave = normalize_note( x, octave, len( scale.diatonic ) )
+        note = scale.full.index( (scale.diatonic if row_even else scale.accidental)[x] )
+    else:
+        note, octave = normalize_note( x, y, len( scale.full ) )
+        
+    print( j, i )
+    return (note, octave)
     
 globalTicks = -1
                 
@@ -134,10 +160,10 @@ def main():
                     break
                 
                 #get note info from key
-                diatonicNote, octave = getKeyInfo( evKey )
-                octave += 2
-                chromaticNote = diatonicToChromatic[diatonicNote]
-                midiNote, midiVel, midiChannel = ( chromaticNote + octave * 12, 90, diatonicNote )
+                scale_note, octave = get_note_info( evKey, scale )
+                octave += 3
+                chromaticNote = note_to_halftones[scale_note]
+                midiNote, midiVel, midiChannel = ( chromaticNote + octave * 12, 90, scale_note )
                 #skip drum channel
                 if midiChannel >= 9: 
                     midiChannel += 1
@@ -145,22 +171,25 @@ def main():
                     midiChannel -= 16
                 
                 #do the note
+                note_tuple = (chromaticNote, octave)
                 args = ( midiNote, midiVel, midiChannel )
                 if toggleNotes:
                     if event.type == KEYDOWN:
-                        if evKey in playingNotes:
-                            playingNotes.remove( evKey )
+                        if note_tuple in playingNotes:
+                            playingNotes.remove( note_tuple )
                             midi.note_off( *args )
                         else:
-                            playingNotes.add( evKey )
+                            playingNotes.add( note_tuple )
                             midi.note_on( *args )
                 else:
                     if event.type == KEYDOWN:
+                        print( 'note info: ', (scale_note, octave) )
+                        print( 'key and midi info: ', evKey, args )
                         midi.note_on( *args )
                     else:
                         midi.note_off( *args )
-                        if evKey in playingNotes:
-                            playingNotes.remove( evKey ) 
+                        if note_tuple in playingNotes:
+                            playingNotes.remove( note_tuple ) 
         clock.tick(60)
     pygame.quit()
 
