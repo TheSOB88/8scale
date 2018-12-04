@@ -1,6 +1,6 @@
 TODO
 Features
-    Graphic display of notes playing
+    Graphic display of notes playing, harmonic relationships
     Change instrument in program
     Change scale in program
     Change pitch/octave offset in program
@@ -10,4 +10,5 @@ Coding
     Move to different frontend lib
     Comments
     Debug statements
-    Read config from file
+    Read config from file/put config data in an object
+    Put the chromatic note/bendcents info in Scale, normalize all options to the same representation

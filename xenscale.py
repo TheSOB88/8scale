@@ -27,15 +27,18 @@ qmsc = qms_chromatic = [ qms[i] if i < 20 else qms[i-1] for i in range( 0, len(q
         #[qms[0], qms[3], qms[6], qms[9], qms[12], qms[15], qms[18], qms[20], qms[23], qms[26], qms[29], qms[32]]
 qms_diatonic = [ qmsc[i] for i in [0, 2, 4, 5, 7, 9, 11] ]
 qms_accidental = [qms[34], qmsc[1], qmsc[3], qms[14], qmsc[6], qmsc[8], qmsc[10]]
-#qmsc.append( qms[34], qms[14 )
+
 qrt_meantone_scale = Scale( qms_chromatic, qms_diatonic, qms_accidental )
+
+ji_ratio = [ 1,  "9/8", "5/4", "4/3", "3/2", "20/12", "15/8" ]
+ji_accidental = ["31/16", "17/16", "6/5", "11/8", "45/32", "24/15", "27/16"]
+ji_scale = Scale( ji_ratio, ji_ratio.copy(), ji_accidental )
 
 # degrees = 12
 # scale = [ Fraction( degrees+i )/degrees for i in range( degrees ) ]
 # scale = oncical_scale
-# scale = qms_chromatic
-scale = qrt_meantone_scale
-degrees = len( scale.full )
+# scale = qrt_meantone_scale
+scale = ji_scale
 
 diatonic_flag = True
 noteShift = -1
@@ -52,7 +55,7 @@ for i, j in enumerate( scale.full ):
     else:
         noteCents = j
         info = str( noteCents )
-    halfTones = math.floor( noteCents / 100 )
+    halfTones = round( noteCents / 100 )
     pitchBend = noteCents / 100 - halfTones
     note_to_halftones.append( halfTones )
     bendCents.append( pitchBend )
@@ -72,9 +75,9 @@ def initPitches( midi ):
 def normalize_note( note, octave, span ):
     if note < 0:
         octave -= 1
-        note += len( scale.diatonic )
-    if note >= len( scale.diatonic ):
-        note -= len( scale.diatonic )
+        note += span
+    if note >= span:
+        note -= span
         octave += 1
     return (note, octave)
 
@@ -99,9 +102,7 @@ def get_note_info( evKey, scale ):
             octave -= 1
         note = scale.full.index( (scale.diatonic if row_even else scale.accidental)[x] )
     else:
-        note, octave = normalize_note( x, y, len( scale.full ) )
-        
-    print( j, i )
+        note, octave = normalize_note( x, y, scale.degrees )
     return (note, octave)
     
 globalTicks = -1
@@ -186,7 +187,7 @@ def main():
                 else:
                     if event.type == KEYDOWN:
                         print( 'note info: ', (scale_note, octave) )
-                        print( 'key and midi info: ', evKey, args )
+                        print( 'key and midi info: ', evKey, args, chromaticNote, bendCents[scale_note] )
                         midi.note_on( *args )
                     else:
                         midi.note_off( *args )
