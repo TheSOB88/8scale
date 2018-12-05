@@ -1,2 +1,2 @@
-# 8scale
-Keyboard MIDI player for harmonic scale (8-15th harmonics)
+# xenscale
+Keyboard MIDI player for xenharmonic scales
