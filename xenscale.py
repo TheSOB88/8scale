@@ -21,7 +21,8 @@ keyboard.reverse()
 #scales
 oncical_scale = Scale( [ 0, 65.52, 161.88, 259.24, 356.6, 453.96, 551.32, 713.2, 810.56, 907.92, 1005.28, 1102.64 ] )
 qms = [0, 41.0590, 76.0490, 117.108, 152.098, 158.167, 193.157, 234.216, 269.206, 310.265, 345.255, 351.324,
-        386.314, 427.373, 462.363, 503.422, 544.480, 579.471, 620.529, 655.520, 696.578, 737.637, 772.627, 813.686, 848.676, 
+        386.314, 427.373, 462.363, 503.422, 544.480, 579.471, 620.529, 
+        655.520, 696.578, 737.637, 772.627, 813.686, 848.676, 
         854.745, 889.735, 930.794, 965.784, 1006.84, 1041.83, 1047.90, 1082.89, 1123.95, 1158.94]
 qmsc = qms_chromatic = [ qms[i] if i < 20 else qms[i-1] for i in range( 0, len(qms), 3 ) ]
         #[qms[0], qms[3], qms[6], qms[9], qms[12], qms[15], qms[18], qms[20], qms[23], qms[26], qms[29], qms[32]]
@@ -34,11 +35,27 @@ ji_ratio = [ 1,  "9/8", "5/4", "4/3", "3/2", "20/12", "15/8" ]
 ji_accidental = ["31/16", "17/16", "6/5", "11/8", "45/32", "24/15", "27/16"]
 ji_scale = Scale( ji_ratio, ji_ratio.copy(), ji_accidental )
 
-# degrees = 12
-# scale = [ Fraction( degrees+i )/degrees for i in range( degrees ) ]
-# scale = oncical_scale
-# scale = qrt_meantone_scale
-scale = ji_scale
+#ratio scales
+rs8 = [ Fraction( 8+i )/8 for i in range( 8 ) ]
+rs12 = [ Fraction( 12+i )/12 for i in range( 12 ) ]
+#12/12 13/12 14/12 15/12 11/08 
+ratio_accdnt = [rs12[0],rs12[1],rs12[2],rs12[3], rs8[3],rs12[7], rs8[6] ]
+#01/01 09/08 10/08 16/12 12/08 13/08 14/08 15/08
+ratio_scale = [ rs8[0], rs8[1], rs8[2], rs12[4], rs8[4],rs12[8], rs8[7] ]
+
+# ratio_accdnt = [1, "13/12", "14/12", "11/08", "17/12", "19/12", "21/12" ]
+# ratio_scale = [ 1, "09/08", "10/08", "15/12", "12/08", "20/12", "15/08" ]
+ratio_full = ratio_scale.copy()
+for i in ratio_accdnt: 
+    ratio_full.append( i )
+print( ratio_full, '\n', len( ratio_full ), '\n' )
+
+scale = Scale( ratio_full, ratio_scale, ratio_accdnt )
+#scale = Scale( rs12 )
+
+#scale = oncical_scale
+#scale = qrt_meantone_scale
+#scale = ji_scale
 
 diatonic_flag = True
 noteShift = -1
@@ -98,8 +115,8 @@ def get_note_info( evKey, scale ):
         row_even = y % 2 == 0
         octave = math.floor( y / 2 )
         x, octave = normalize_note( x, octave, len( scale.diatonic ) )
-        if not row_even and x == 0:
-            octave -= 1
+        # if not row_even and x == 0:
+            # octave -= 1
         note = scale.full.index( (scale.diatonic if row_even else scale.accidental)[x] )
     else:
         note, octave = normalize_note( x, y, scale.degrees )
@@ -186,8 +203,8 @@ def main():
                             midi.note_on( *args )
                 else:
                     if event.type == KEYDOWN:
-                        print( 'note info: ', (scale_note, octave) )
-                        print( 'key and midi info: ', evKey, args, chromaticNote, bendCents[scale_note] )
+                        print( 'scale degree, octave: ', (scale_note + 1, octave) )
+                        print( 'key and midi info: ', evKey, args, chromaticNote, bendCents[scale_note] * 100 )
                         midi.note_on( *args )
                     else:
                         midi.note_off( *args )
