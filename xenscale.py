@@ -29,11 +29,11 @@ qmsc = qms_chromatic = [ qms[i] if i < 20 else qms[i-1] for i in range( 0, len(q
 qms_diatonic = [ qmsc[i] for i in [0, 2, 4, 5, 7, 9, 11] ]
 qms_accidental = [qms[34], qmsc[1], qmsc[3], qms[14], qmsc[6], qmsc[8], qmsc[10]]
 
-qrt_meantone_scale = Scale( qms_chromatic, qms_diatonic, qms_accidental )
+qrt_meantone_scale = Scale( qms_diatonic, qms_accidental )
 
 ji_ratio = [ 1,  "9/8", "5/4", "4/3", "3/2", "20/12", "15/8" ]
 ji_accidental = ["31/16", "17/16", "6/5", "11/8", "45/32", "24/15", "27/16"]
-ji_scale = Scale( ji_ratio, ji_ratio.copy(), ji_accidental )
+ji_scale = Scale( ji_ratio.copy(), ji_accidental )
 
 #ratio scales
 rs8 = [ Fraction( 8+i )/8 for i in range( 8 ) ]
@@ -43,21 +43,57 @@ ratio_accdnt = [rs12[0],rs12[1],rs12[2],rs12[3], rs8[3],rs12[7], rs8[6] ]
 #01/01 09/08 10/08 16/12 12/08 13/08 14/08 15/08
 ratio_scale = [ rs8[0], rs8[1], rs8[2], rs12[4], rs8[4],rs12[8], rs8[7] ]
 
-# ratio_accdnt = [1, "13/12", "14/12", "11/08", "17/12", "19/12", "21/12" ]
-# ratio_scale = [ 1, "09/08", "10/08", "15/12", "12/08", "20/12", "15/08" ]
-ratio_full = ratio_scale.copy()
-for i in ratio_accdnt: 
-    ratio_full.append( i )
-print( ratio_full, '\n', len( ratio_full ), '\n' )
+ratio_accdnt= [ 1, "13/12", "14/12", "11/08", "17/12", "19/12", "21/12" ]
+ratio_scale = [ 1, "09/08", "10/08", "16/12", "12/08", "20/12", "15/08" ]
 
-scale = Scale( ratio_full, ratio_scale, ratio_accdnt )
+scale = Scale( ratio_scale, ratio_accdnt )
+
+maj3_scale = [ 1, "5/4", "25/16", "125/64"] #, "625/256", "3125/1024" ]
+temp = []
+for i, r in enumerate( maj3_scale ):
+    temp.append( r )
+    #temp.append( Fraction( r ) * math.pow( 5/4, 1/3 ) )
+    temp.append( Fraction( r ) * math.pow( 5/4, 1/2 ) )
+    temp.append( Fraction( r ) * math.pow( 5/4, 5/6 ) )
+temp.pop()
+temp.pop()
+scale = Scale( temp )
+
+#maj3 with reversed (down from 2)
+maj3_wr_scale = [ 1, 1.024, 1.25, 1.28, 1.5625, 1.6, 1.953125 ]
+temp = []
+for i, r in enumerate( maj3_wr_scale ):
+    temp.append( r )
+    temp.append( Fraction( r ) * math.pow( 5/4, 1/2 ) )
+temp.sort()
+scale = Scale( temp )
+
+
+scale = Scale( [ "7", "8", 9, 10, 11, 12, 13, 14, 15 ] )
+        
+scale = [ 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 ]
+scale = list( map( lambda x: x/12, scale ) )
+scale = Scale( scale )
+
+scale = [ 1, 7/6, 6/5, 5/4, 9/7, 4/3, 3/2, 15/11, 14/11, 11/9 ]
+scale.sort()
+scale = Scale( scale )
+
+rs8[1] = 1.109
+rs8.insert( 4, 1.475 )
+scale = Scale( rs8 )
+
+scale = Scale( [ 1, 13/12, 14/12, 15/12, 16/12, 3/2, 13/8, 14/8, 15/8 ] )
+
+# scale = Scale( [ 0, 150, 350, 498, 551, 649, 702, 850, 1050 ] )
+
+instrument = 33
 #scale = Scale( rs12 )
-
 #scale = oncical_scale
 #scale = qrt_meantone_scale
 #scale = ji_scale
 
-diatonic_flag = True
+diatonic_flag = scale.is_diatonic
 noteShift = -1
 
 note_to_halftones = []#, 0, 2, 4, 5, 7, 9, 9, 10]
@@ -86,7 +122,7 @@ def initPitches( midi ):
         if i > 8:
             i += 1
         midi.pitch_bend( int( halfTone * bend ), i )
-        midi.set_instrument( 62, i )
+        midi.set_instrument( instrument, i )
 
 #keeps note within an octave span, updates octave appropriately
 def normalize_note( note, octave, span ):
@@ -168,16 +204,19 @@ def main():
                     print( 'quittin\'' )
                     break
                 #toggle the note toggle
-                if evKey == K_SPACE and event.type == KEYDOWN:
-                    toggleNotes = not toggleNotes
+                if evKey == K_SPACE: 
+                    if event.type == KEYDOWN:
+                        toggleNotes = not toggleNotes
                     break
                 #stop all notes
-                if evKey == K_RALT and event.type == KEYDOWN:
-                    for i in range( 0, 16 ):
-                        midi.write( [[[0xb0 + i,123,0], time.time()]] )
-                        playingNotes = set()
-                    initPitches( midi )
+                if evKey == K_RALT: 
+                    if event.type == KEYDOWN:
+                        for i in range( 0, 16 ):
+                            midi.write( [[[0xb0 + i,123,0], time.time()]] )
+                            playingNotes = set()
+                        initPitches( midi )
                     break
+                
                 
                 #get note info from key
                 scale_note, octave = get_note_info( evKey, scale )
@@ -191,6 +230,7 @@ def main():
                     midiChannel -= 16
                 
                 #do the note
+                do_note_log = False
                 note_tuple = (chromaticNote, octave)
                 args = ( midiNote, midiVel, midiChannel )
                 if toggleNotes:
@@ -201,15 +241,21 @@ def main():
                         else:
                             playingNotes.add( note_tuple )
                             midi.note_on( *args )
+                            do_note_log = True
                 else:
                     if event.type == KEYDOWN:
-                        print( 'scale degree, octave: ', (scale_note + 1, octave) )
-                        print( 'key and midi info: ', evKey, args, chromaticNote, bendCents[scale_note] * 100 )
                         midi.note_on( *args )
+                        do_note_log = True
+                        playingNotes.add( note_tuple )
                     else:
                         midi.note_off( *args )
                         if note_tuple in playingNotes:
-                            playingNotes.remove( note_tuple ) 
+                            playingNotes.remove( note_tuple )
+                
+                if do_note_log:
+                    print( 'scale degree, octave: ', (scale_note + 1, octave) )
+                    print( 'key and midi info: ', evKey, args, 
+                            chromaticNote % 12 * 100 + bendCents[scale_note] * 100 )
         clock.tick(60)
     pygame.quit()
 
