@@ -16,7 +16,7 @@ class Scale:
     def __init__( self, diatonic, accidental = [] ):
         self.full, self.diatonic, self.accidental = [], [], []
         self.use_ratios = isinstance( diatonic[1], str ) or diatonic[1] < 2
-        self.note_to_halftones, self.bend_cents = [], []
+        self.note_to_halftones, self.bend_cents, self.note_channel = [], [], []
         self.info = ''
         
         for i in diatonic:
@@ -42,17 +42,24 @@ class Scale:
                 noteCents = j
                 note_info = str( noteCents )
             halfTones = round( noteCents / 100 )
-            pitchBend = noteCents / 100 - halfTones
+            pitchBend = round( noteCents / 100 - halfTones, 4 )
+            
+            note_channel = i
+            if pitchBend in self.bend_cents:
+                note_channel = self.bend_cents.index( pitchBend )
+            if note_channel > 8: #skip drum channel
+                note_channel += 1
+                
             self.note_to_halftones.append( halfTones )
             self.bend_cents.append( pitchBend )
+            self.note_channel.append( note_channel )
+            
             self.info += str( ( i+1, note_info, noteCents, halfTones, pitchBend ) ) + '\n'
         
     def initPitches( self, midi ):
         halfTone = 4096
-        for i, bend in enumerate( self.bend_cents ):
-            #skip drum channel
-            if i > 8:
-                i += 1
+        for i in set( self.note_channel ):
+            bend = self.bend_cents[ self.note_channel[i] ]
             midi.pitch_bend( int( halfTone * bend ), i )
             midi.set_instrument( consts.instrument, i )
 
@@ -88,4 +95,4 @@ class Scale:
             note = self.full.index( (self.diatonic if row_even else self.accidental)[x] )
         else:
             note, octave = self.normalize_note( x, y, self.degrees )
-        return (note, octave)
+        return (note, octave, self.note_channel[note])

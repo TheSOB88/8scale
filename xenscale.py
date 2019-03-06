@@ -82,6 +82,7 @@ scale = Scale( [ 1, 13/12, 14/12, 15/12, 16/12, 3/2, 13/8, 14/8, 15/8 ] )
 scale = Scale( [ 0, 150, 350, 498, 551, 649, 702, 850, 1050 ] )
 scale = Scale( [ 0, 150, 300, 450, 600, 750, 900, 1050 ] )
 scale = Scale( [ 0, 150, 300, 400, 500, 550, 650, 700, 800, 900, 1050 ] )
+scale = Scale( list( range(1200)[0:1200:60] ) )
 
 #scale = Scale( rs12 )
 #scale = oncical_scale
@@ -153,15 +154,10 @@ def main():
                 
                 
                 #get note info from key
-                scale_note, octave = scale.get_note_info( evKey )
+                scale_note, octave, midiChannel = scale.get_note_info( evKey )
                 octave += 3
                 chromaticNote = scale.note_to_halftones[scale_note]
-                midiNote, midiVel, midiChannel = ( chromaticNote + octave * 12, 90, scale_note )
-                #skip drum channel
-                if midiChannel >= 9: 
-                    midiChannel += 1
-                if midiChannel > 15:
-                    midiChannel -= 16
+                midiNote, midiVel = ( chromaticNote + octave * 12, 90 )
                 
                 #do the note
                 do_note_log = False
