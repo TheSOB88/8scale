@@ -149,7 +149,7 @@ def main():
                         for i in range( 0, 16 ):
                             midi.write( [[[0xb0 + i,123,0], time.time()]] )
                             playingNotes = set()
-                        initPitches( midi )
+                        scale.initPitches( midi )
                     break
                 
                 
