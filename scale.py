@@ -59,9 +59,14 @@ class Scale:
     def initPitches( self, midi ):
         halfTone = 4096
         for i in set( self.note_channel ):
-            bend = self.bend_cents[ self.note_channel[i] ]
-            midi.pitch_bend( int( halfTone * bend ), i )
             midi.set_instrument( consts.instrument, i )
+            if i > 8:
+                i -= 1            
+            j = self.note_channel[i]
+            if j > 8:
+                j -= 1            
+            bend = self.bend_cents[ j ]
+            midi.pitch_bend( int( halfTone * bend ), i )
 
     #keeps note within an octave span, updates octave appropriately
     def normalize_note( self, note, octave, span ):

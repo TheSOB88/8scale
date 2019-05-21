@@ -1,13 +1,14 @@
 TODO
 Features
+	Use config for scales/instrument/settings
+    Different keyboard setups (rows for accidentals)
     Graphic display of notes playing, harmonic relationships
     Change instrument in program
     Change scale in program
     Change pitch/octave offset in program
-    Different keyboard setups (rows for accidentals)
 
 Coding
-    Move to different frontend lib
+    Move to different frontend lib (for latency)
     Comments
     Debug statements
     Read config from file/put config data in an object

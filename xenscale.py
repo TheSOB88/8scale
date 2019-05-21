@@ -84,6 +84,19 @@ scale = Scale( [ 0, 150, 300, 450, 600, 750, 900, 1050 ] )
 scale = Scale( [ 0, 150, 300, 400, 500, 550, 650, 700, 800, 900, 1050 ] )
 scale = Scale( list( range(1200)[0:1200:60] ) )
 
+scale = Scale( [ 0, 140, 360, 450, 630, 720, 900, 1080 ] )
+scale = Scale( [ 0, 125, 360, 450, 590, 702, 900, 1080, 1140 ] )
+scale = Scale( [ 0, 116, 267, 450, 582, 654, 702 ] )
+w = 283
+scale = Scale( [ 0, 720 - w * 2, 720 - w, 720, 720 + w ] )
+_scale = [ x/9 * 1200 for x in range( 9 ) ]
+_scale.__delitem__( 7 )
+_scale.__delitem__( 2 )
+scale = Scale( _scale )
+scale = Scale( [ 0, 133.33, 400, 520, 680, 800, 1066.67 ], [ 0, 66.67, 266.67, 366.67, 533.33, 666.67, 933.33 ] )
+
+
+#scale = Scale( [ 1, '7/6', '6/5', '5/4', '9/7', '4/3', 3/2, '15/11', '14/11', '11/9' ] )
 #scale = Scale( rs12 )
 #scale = oncical_scale
 #scale = qrt_meantone_scale
@@ -95,6 +108,7 @@ def main():
     print( scale.info )
     print( scale.bend_cents )
     print( scale.note_to_halftones )
+    print( scale.note_channel )
     
     gameWindow = Rect( 0, 0, 100, 30 )
     clock = pygame.time.Clock()
