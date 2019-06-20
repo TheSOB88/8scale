@@ -4,6 +4,6 @@ keyboard = [ [96, 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 45, 61, 8], #num row
         [304, 122, 120, 99, 118, 98, 110, 109, 44, 46, 47, 303, 273] ] #shift row
 keyboard.reverse()
 
-instrument = 33
+instrument = 42
 
 noteShift = -1
